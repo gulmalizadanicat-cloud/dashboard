@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    .card { background: white; padding: 15px 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    .title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Satış Dashboard</h1>
+  <div id="dashboard"></div>
+
+  <script>
+    async function loadDashboard() {
+      const SHEET_ID = "17qXOuePLlCtB8Z-J5e7xISkJ0VybGuAVZSxPTXq4ilc";
+      const url = `https://opensheet.elk.sh/${SHEET_ID}/1`;
+      const data = await fetch(url).then(r => r.json());
+
+      // Misal: bugünkü satış toplamaq
+      const today = new Date().toLocaleDateString("en-GB").split("/").reverse().join(".");
+
+      let total = 0;
+      data.forEach(r => {
+        if (r["Verilmə tarixi"] === today) {
+          const val = parseFloat(r["Hissəli ödəniş məbləği"].toString().replace(/[^0-9\\.]/g,""));
+          if (!isNaN(val)) total += val;
+        }
+      });
+
+      const html = `
+        <div class="card">
+          <div class="title">📅 Bu gün – ${today}</div>
+          <div>Satış (ümumi): <strong>${total.toFixed(2)} AZN</strong></div>
+        </div>
+      `;
+      document.getElementById("dashboard").innerHTML = html;
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
